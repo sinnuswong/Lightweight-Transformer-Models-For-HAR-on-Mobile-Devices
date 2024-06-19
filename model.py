@@ -599,8 +599,12 @@ def mobileHART_XS(input_shape,activityCount,projectionDims = [96,120,144],filter
     inputs = layers.Input(shape=input_shape)
 
     # Initial conv-stem -> MV2 block.
-    accX = conv_block(inputs[:,:,:3],filters=filterCount[0])
-    gyroX = conv_block(inputs[:,:,3:],filters=filterCount[0])
+    accX_inputs = inputs[:,:,:3]
+    gyroX_inputs = inputs[:,:,3:]
+    print(input_shape)
+    print(accX_inputs.shape, gyroX_inputs.shape)
+    accX = conv_block(accX_inputs,filters=filterCount[0])
+    gyroX = conv_block(gyroX_inputs,filters=filterCount[0])
     accX = mv2Block(accX,expansion_factor,filterCount)
     gyroX = mv2Block(gyroX,expansion_factor,filterCount)
     accX, gyroX  = sensorWiseHART(accX,gyroX, num_blocks=2, projection_dim=projectionDims[0])

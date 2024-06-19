@@ -49,15 +49,15 @@ showTrainVerbose = 1
 segment_size = 25
 
 # input channel count
-num_input_channels = 2
+num_input_channels = 6
 
-learningRate = 5e-3
+learningRate = 1e-3
 
 # model drop out rate
 dropout_rate = 0.3
 
 # local epoch
-localEpoch = 1
+localEpoch = 50
 # or 4
 frameLength = 16
 
@@ -141,7 +141,7 @@ assert R * filterAttentionHead == projectionHalf
 if dataSetName == 'train_hit_c25':
     ACTIVITY_LABEL = ['none', 'yes']
 
-activityCount = len(ACTIVITY_LABEL)
+activityCount = 2
 
 # 这里没看懂
 architectureType = str(architecture) + '_' + str(int(frameLength)) + 'frameLength_' + str(timeStep) + 'TimeStep_' + str(
@@ -193,13 +193,12 @@ _, centralTestData, _, centralTestLabel = train_test_split(centralTrainData,
                                                                                         centralTrainLabel,
                                                                                         test_size=0.1,
                                                                                         random_state=randomSeed)
+print("***************fuck")
+print(centralTrainData[0])
+print(centralTrainLabel[0])
+print(centralDevData[0])
+print(centralDevLabel[0])
 # ************************ data prepare
-
-# Compute class weight
-temp_weights = class_weight.compute_class_weight(class_weight='balanced',
-                                                 classes=np.unique(centralTrainLabel),
-                                                 y=centralTrainLabel.ravel())
-class_weights = {j: temp_weights[j] for j in range(len(temp_weights))}
 
 # One Hot of labels
 centralTrainLabel = tf.one_hot(
@@ -241,7 +240,7 @@ model_classifier.compile(
     loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
     metrics=["accuracy"],
 )
-model_classifier.summary()
+# model_classifier.summary()
 # ********************************************************************************************************************************************
 
 checkpoint_filepath = filepath + "bestValcheckpoint.h5"
@@ -255,6 +254,18 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
 
 start_time = time.time()
 # ********************************************** training start
+print("********************** start train")
+print(centralTrainData.shape)
+print(centralTrainLabel.shape)
+print(centralDevData.shape)
+print(centralDevLabel.shape)
+print(centralTrainLabel[0])
+# (15069, 128, 6)
+# (15069, 6)
+# (2153, 128, 6)
+# (2153, 6)
+# tf.Tensor([0. 0. 1. 0. 0. 0.], shape=(6,), dtype=float32)
+
 history = model_classifier.fit(
     x=centralTrainData,
     y=centralTrainLabel,
@@ -262,7 +273,6 @@ history = model_classifier.fit(
     batch_size=batch_size,
     epochs=localEpoch,
     verbose=showTrainVerbose,
-    class_weight=class_weights,
     callbacks=[checkpoint_callback],
 )
 end_time = time.time() - start_time

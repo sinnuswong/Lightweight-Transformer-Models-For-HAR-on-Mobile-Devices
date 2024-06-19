@@ -245,7 +245,7 @@ if (dataSetName == "COMBINED"):
     centralTrainLabel = np.hstack((centralTrainLabelAligned))
     centralTestLabel = np.hstack((centralTestLabelAligned))
 else:
-    print("data set name************** "+dataSetName)
+    print("data set name************** " + dataSetName)
     clientCount = utils.returnClientByDataset(dataSetName)
     print(clientCount)
     datasetLoader = utils.loadDataset(dataSetName, clientCount, dataConfig, randomSeed, mainDir + 'datasets/')
@@ -268,6 +268,18 @@ else:
 
     print("data set name************** " + dataSetName)
 
+print("******************************************")
+print(centralTrainData.shape)
+print(centralTrainLabel.shape)
+print(centralTrainLabel[0])
+print(type(centralTrainData))
+print(type(centralTrainLabel))
+
+# (15069, 128, 6)
+# (15069, 6)
+# (2153, 128, 6)
+# (2153, 6)
+# tf.Tensor([0. 0. 1. 0. 0. 0.], shape=(6,), dtype=float32)
 # If working on RealWorld or HHAR with specified position/device, we remove one and use it as the test set and combine the others for training
 if (positionDevice != '' or dataSetName == 'UCI'):
     if (dataSetName == "RealWorld"):
@@ -306,13 +318,16 @@ else:
                                                                                             centralTrainLabel,
                                                                                             test_size=0.125,
                                                                                             random_state=randomSeed)
+print("train label " + str(centralTrainLabel.shape))
+print("train label " + str(centralTrainLabel[0]))
 
 # Compute class weight
 temp_weights = class_weight.compute_class_weight(class_weight='balanced',
                                                  classes=np.unique(centralTrainLabel),
                                                  y=centralTrainLabel.ravel())
+print(temp_weights)
 class_weights = {j: temp_weights[j] for j in range(len(temp_weights))}
-
+print(class_weights)
 # One Hot of labels
 centralTrainLabel = tf.one_hot(
     centralTrainLabel,
@@ -341,7 +356,21 @@ centralDevLabel = tf.one_hot(
     dtype=None,
     name=None
 )
-
+print("******************************************")
+print(centralTrainData.shape)
+print(centralTrainLabel.shape)
+print(centralDevData.shape)
+print(centralDevLabel.shape)
+print(centralTrainLabel[0])
+print(type(centralTrainData))
+print(type(centralTrainLabel))
+print(type(centralDevData))
+print(type(centralDevLabel))
+# (15069, 128, 6)
+# (15069, 6)
+# (2153, 128, 6)
+# (2153, 6)
+# tf.Tensor([0. 0. 1. 0. 0. 0.], shape=(6,), dtype=float32)
 optimizer = tf.keras.optimizers.Adam(learningRate)
 
 if (architecture == "HART"):
@@ -353,7 +382,7 @@ model_classifier.compile(
     loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
     metrics=["accuracy"],
 )
-model_classifier.summary()
+# model_classifier.summary()
 
 checkpoint_filepath = filepath + "bestValcheckpoint.h5"
 checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -365,12 +394,6 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
 )
 
 start_time = time.time()
-print("******************************************")
-print(centralTrainData.shape)
-print(centralTrainLabel.shape)
-print(centralDevData.shape)
-print(centralDevLabel.shape)
-print(centralTrainLabel[0])
 
 history = model_classifier.fit(
     x=centralTrainData,
@@ -446,7 +469,7 @@ for index, classLoc in enumerate(indices):
     else:
         attentionScores = np.mean(attentionAccWeights[0], axis=0)[0, :]
     attentionScoresNorm = ((attentionScores - min(attentionScores)) / (
-                max(attentionScores) - min(attentionScores)) - 1) * - 0.5
+            max(attentionScores) - min(attentionScores)) - 1) * - 0.5
     gs = gridspec.GridSpec(2, 1)
     fig = plt.figure()
     plt.title("Attention Map for " + ACTIVITY_LABEL[index] + " ", size=16)
@@ -482,7 +505,7 @@ for index, classLoc in enumerate(indices):
     else:
         attentionScores = np.mean(attentionGyroWeights[0], axis=0)[0, :]
     attentionScoresNorm = ((attentionScores - min(attentionScores)) / (
-                max(attentionScores) - min(attentionScores)) - 1) * - 0.5
+            max(attentionScores) - min(attentionScores)) - 1) * - 0.5
 
     ax = fig.add_subplot(gs[1], sharex=ax)
     ax.margins(x=0)
