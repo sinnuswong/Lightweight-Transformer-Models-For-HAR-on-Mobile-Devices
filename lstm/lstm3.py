@@ -4,13 +4,9 @@ from keras.layers import ConvLSTM2D
 from tensorflow.keras.models import load_model
 import myutil
 
-# Sequential = tf.keras.Sequential
-# LSTM = tf.keras.layers.LSTM
-# Flatten = tf.keras.layers.Flatten
-# Dense = tf.keras.layers.Dense
 l2 = tf.keras.regularizers.L2
 Adam = tf.keras.optimizers.Adam
-
+# 256, 64batch
 hidden_units = 128
 window_size = 25
 feature_size = 6
@@ -19,11 +15,11 @@ L2 = 0.000001
 
 model = tf.keras.Sequential(name='sequential_1')
 
-model.add(tf.keras.layers.LSTM(hidden_units, return_sequences=False, input_shape=(window_size, feature_size),
+model.add(tf.keras.layers.LSTM(hidden_units, return_sequences=True, input_shape=(window_size, feature_size),
                                kernel_initializer='orthogonal', kernel_regularizer=l2(L2), recurrent_regularizer=l2(L2),
                                bias_regularizer=l2(L2), name="LSTM_1"))
 
-# model.add(tf.keras.layers.Flatten(name='Flatten'))
+model.add(tf.keras.layers.Flatten(name='Flatten'))
 model.add(tf.keras.layers.Dense(hidden_units, activation='relu', kernel_regularizer=l2(L2), bias_regularizer=l2(L2),
                                 name="Dense_1"))
 model.add(tf.keras.layers.Dense(hidden_units, activation='relu', kernel_regularizer=l2(L2), bias_regularizer=l2(L2),

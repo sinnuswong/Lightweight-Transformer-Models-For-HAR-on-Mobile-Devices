@@ -18,13 +18,15 @@ def load_data_from_directory(directory):
             # df = df.iloc[:, 1:]
             # # 将数据添加到列表中
             # data.append(df.values)
+            # print(filepath)
             lines = open(filepath).readlines()
             # print(lines)
             lines = lines[1:]
             dd = []
             for l in lines:
                 sn = l.split(',')
-                float_data = [float(x) for x in sn][1:]
+                # print(sn)
+                float_data = [float(x.strip('"\n')) for x in sn][1:]
                 if len(float_data) == 6:
                     dd.append(np.array(float_data))
 
@@ -60,4 +62,35 @@ def build_badminton_hit_data():
     return data, labels
 
 
-# build_badminton_data()
+def build_badminton_kill_data():
+    # 加载第一个目录的数据
+    category1_data = load_data_from_directory('./kill_high_long_hit/forehand_pingchou')
+
+    # 加载第二个目录的数据
+    category2_data = load_data_from_directory('./kill_high_long_hit/high_long_shot')
+    category3_data = load_data_from_directory('./kill_high_long_hit/kill_shot')
+
+    print(category1_data.shape)
+    print(category2_data.shape)
+    print(category3_data.shape)
+
+    # 将数据转换为NumPy数组，并整合到一个大的数据数组中
+    data = np.concatenate((category1_data, category2_data, category3_data), axis=0)
+
+    # 创建对应的标签数组，其中category1对应标签0，category2对应标签1
+    # 创建一个形状为 (2173, 2) 的数组
+    aa1 = [0 for i in range(len(category1_data))]
+    aa2 = [1 for i in range(len(category2_data))]
+    aa3 = [2 for i in range(len(category3_data))]
+
+    a1 = np.array(aa1 + aa2 + aa3)
+
+    labels = a1
+
+    print(labels)
+    # 打印数据和标签的形状，确保正确加载和整理
+    print("Data shape:", data.shape)  # 应为 (2000, 25, 6)
+    print("Labels shape:", labels.shape)  # 应为 (2000,)
+    return data, labels
+
+# build_badminton_kill_data()
