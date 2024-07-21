@@ -37,12 +37,12 @@ def load_data_from_directory(directory):
     return np.stack(data)
 
 
-def build_badminton_hit_data():
+def build_badminton_hit_data(hit_path):
     # 加载第一个目录的数据
-    category1_data = load_data_from_directory('./train_hit_c25/none')
+    category1_data = load_data_from_directory(hit_path + '/none')
 
     # 加载第二个目录的数据
-    category2_data = load_data_from_directory('./train_hit_c25/yes')
+    category2_data = load_data_from_directory(hit_path + '/yes')
     print(category1_data.shape)
     # 将数据转换为NumPy数组，并整合到一个大的数据数组中
     data = np.concatenate((category1_data, category2_data), axis=0)

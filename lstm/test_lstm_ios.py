@@ -3,7 +3,8 @@ import numpy as np
 from tensorflow.keras.models import load_model
 import myutil
 
-data, labels = myutil.build_badminton_hit_data()
+
+# data, labels = myutil.build_badminton_hit_data()
 
 
 def read_floats_from_binary(file_path):
@@ -38,8 +39,8 @@ def reshape_data_to_motion_frame(data, feature_size=6):
 
 
 aaaaaq = "./error910A7242__1713273736716__CN__Watch7,3__right__right__2024_04_16_21_22_16.ad"
-
-file_path = './C13D0A02__1718283752630__CN__Watch7,2__right__right__2024_06_13_21_02_32.ad'
+# 高远球0CABAC36__1720177032222__CN__S7_41mm__right__right__2024_07_05_18_57_12.ad
+file_path = '../aatest/F954FC8A__1718433170022__CN__S8_45mm__right__right__2024_06_15_14_32_50.ad'  # './C13D0A02__1718283752630__CN__Watch7,2__right__right__2024_06_13_21_02_32.ad'
 
 # 读取二进制文件中的 float 数据
 float_data = read_floats_from_binary(file_path)
@@ -100,7 +101,7 @@ class HitRecognizer:
         self.state2 = self.interpreter.get_tensor(self.output_details[2]["index"])
 
         ###
-        #self.interpreter.reset_all_variables()
+        self.interpreter.reset_all_variables()
         # self.interpreter.set_tensor(self.input_details[0]["index"], np.zeros((1, 128), dtype=np.float32))
         # self.interpreter.set_tensor(self.input_details[1]["index"], np.zeros((1, 128), dtype=np.float32))
         # self.interpreter.set_tensor(self.input_details[2]["index"], window_frame.astype(np.float32))
@@ -146,6 +147,8 @@ class KillRecognizer:
         # self.state2 = self.interpreter.get_tensor(self.output_details[2]["index"])
 
         return result[0]
+
+
 class KillRecognizer1:
 
     def __init__(self, model_file_path):
@@ -167,7 +170,7 @@ class KillRecognizer1:
 
         self.interpreter.invoke()
         result = self.interpreter.get_tensor(self.output_details[0]["index"])
-        print("saaaa "+str(result))
+        print("saaaa " + str(result))
         # self.interpreter.reset_all_variables()
         return result[0]
 
@@ -191,41 +194,38 @@ def test_with_padding(motion_frame, feature_size, window_size, padding=10):
     kill_ress = []
     high_long = 0
     ping_chou = 0
-    cur_hit_recognizer = HitRecognizer(model_file_path='./keras_lstm3_ios_hit.tflite')
-    prev_hit_recognizer = HitRecognizer(model_file_path='./keras_lstm3_ios_hit.tflite')
-    next_hit_recognizer = HitRecognizer(model_file_path='./keras_lstm3_ios_hit.tflite')
-    # cur_kill_recognizer = KillRecognizer(model_file_path='./model_LSTM3_ios_kill.tflite')
+    cur_hit_recognizer = HitRecognizer(model_file_path='./ios/right_model/right_lstm_hit.tflite')
+    prev_hit_recognizer = HitRecognizer(model_file_path='./ios/right_model/right_lstm_hit.tflite')
+    next_hit_recognizer = HitRecognizer(model_file_path='./ios/right_model/right_lstm_hit.tflite')
 
-    cur_kill_recognizer = KillRecognizer1(model_file_path='./keras_lstm3_ios_kill.tflite')
+    cur_kill_recognizer = KillRecognizer1(model_file_path='./ios/right_model/right_lstm_kill.tflite')
 
-    a = cur_kill_recognizer.predict(motion_frame[6865:6890, :], window_size=window_size, feature_size=feature_size)
-    print(get_max_acc_position(motion_frame[6865:6890, :]))
-    b = cur_kill_recognizer.predict(motion_frame[6870:6895, :], window_size=window_size, feature_size=feature_size)
-    print(get_max_acc_position(motion_frame[6870:6895, :]))
+    # a = cur_kill_recognizer.predict(motion_frame[6865:6890, :], window_size=window_size, feature_size=feature_size)
+    # print(get_max_acc_position(motion_frame[6865:6890, :]))
+    # b = cur_kill_recognizer.predict(motion_frame[6870:6895, :], window_size=window_size, feature_size=feature_size)
+    # print(get_max_acc_position(motion_frame[6870:6895, :]))
+    #
+    # c = cur_kill_recognizer.predict(motion_frame[6875:6900, :], window_size=window_size, feature_size=feature_size)
+    # print(get_max_acc_position(motion_frame[6875:6900, :]))
+    #
+    # print("hahaha")
+    # print(a)
+    # print(b)
+    # print(c)
+    # print(cur_kill_recognizer.predict(motion_frame[6860:6885, :], window_size=window_size, feature_size=feature_size))
+    # print(cur_kill_recognizer.predict(motion_frame[6855:6880, :], window_size=window_size, feature_size=feature_size))
 
-    c = cur_kill_recognizer.predict(motion_frame[6875:6900, :], window_size=window_size, feature_size=feature_size)
-    print(get_max_acc_position(motion_frame[6875:6900, :]))
-
-    print("hahaha")
-    print(a)
-    print(b)
-    print(c)
-    print(cur_kill_recognizer.predict(motion_frame[6860:6885, :], window_size=window_size, feature_size=feature_size))
-    print(cur_kill_recognizer.predict(motion_frame[6855:6880, :], window_size=window_size, feature_size=feature_size))
-
-    threshold = 0.8
+    threshold = 0.78
     last_flag = -1
     last_index = 0
-    for i in range(10, len(motion_frame - padding - window_size - 15), window_size):
-        cur_window_frame = motion_frame[i:i + window_size, :]
-        prev_window_frame = motion_frame[i - padding:i + window_size - padding, :]
-        next_window_frame = motion_frame[i + padding:i + window_size + padding, :]
+    for i in range(0, len(motion_frame) - padding - padding - window_size, window_size):
+        prev_window_frame = motion_frame[i:i + window_size, :]
+        cur_window_frame = motion_frame[i + padding:i + window_size + padding, :]
+        next_window_frame = motion_frame[i + padding + padding:i + window_size + padding + padding, :]
         # print(cur_window_frame.shape)
         cur_res = cur_hit_recognizer.predict(cur_window_frame, window_size=window_size, feature_size=feature_size)
         prev_res = prev_hit_recognizer.predict(prev_window_frame, window_size=window_size, feature_size=feature_size)
         next_res = next_hit_recognizer.predict(next_window_frame, window_size=window_size, feature_size=feature_size)
-
-        cur_kill_res = cur_kill_recognizer.predict(cur_window_frame, window_size=window_size, feature_size=feature_size)
 
         best_ranges_string = ["[" + str(i - padding) + ":" + str(i + window_size - padding) + "]   " + str(prev_res),
                               "[" + str(i) + ":" + str(i + window_size) + "]   " + str(cur_res),
@@ -241,15 +241,15 @@ def test_with_padding(motion_frame, feature_size, window_size, padding=10):
         max_res = 0
         if prev_res > cur_res and prev_res > next_res:
             flag = 0
-            new_index = i - padding
+            new_index = i
             max_res = prev_res
         elif cur_res > prev_res and cur_res > next_res:
             flag = 1
-            new_index = i
+            new_index = i + padding
             max_res = cur_res
         elif next_res > prev_res and next_res > cur_res:
             flag = 2
-            new_index = i + padding
+            new_index = i + padding + padding
             max_res = next_res
         if max_res > threshold:
             if last_flag == 2 and flag == 0 or last_index + 25 > new_index:
@@ -258,7 +258,7 @@ def test_with_padding(motion_frame, feature_size, window_size, padding=10):
                 best_range = best_ranges[flag]
                 best_center = get_max_acc_position(motion_frame[best_range[0]:best_range[1], :])
                 print(best_center)
-                best_frame = motion_frame[best_range[0]-(13-best_center):best_range[1]-(13-best_center), :]
+                best_frame = motion_frame[best_range[0] - (12 - best_center):best_range[1] - (12 - best_center), :]
                 best_kill_res = cur_kill_recognizer.predict(best_frame, window_size=window_size,
                                                             feature_size=feature_size)
                 print(best_kill_res)
@@ -277,7 +277,6 @@ def test_with_padding(motion_frame, feature_size, window_size, padding=10):
     print("kill res is " + str(kill))
     print("highlong res is " + str(high_long))
     print("ping_chou res is " + str(ping_chou))
-
 
     for r in kill_ress:
         print(r)
