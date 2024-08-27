@@ -2,40 +2,10 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.models import load_model
 import myutil
+from ad_reader import read_motion_floats_from_ad, reshape_motion_floats_to_window_frames, reshape_motion_floats_to_motion_frames
 
 
 # data, labels = myutil.build_badminton_hit_data()
-
-
-def read_floats_from_binary(file_path):
-    # 读取二进制文件中的所有 float 数据
-    data = np.fromfile(file_path, dtype=np.float32)
-    delete_indices = np.arange(0, len(data), 7)
-    # 删除指定索引的元素
-    new_data = np.delete(data, delete_indices)
-    return new_data
-
-
-def reshape_data_to_frames(data, feature_size=6, window_size=25):
-    # 计算总的帧数
-    total_frames = data.shape[0] // feature_size
-
-    # 计算完整组的数量
-    num_groups = total_frames // window_size
-
-    # 截断不完整的数据
-    truncated_data = data[:num_groups * window_size * feature_size]
-
-    # 重新形状为 (num_groups, group_size, frame_size)
-    reshaped_data = truncated_data.reshape((num_groups, window_size, feature_size))
-    return reshaped_data
-
-
-def reshape_data_to_motion_frame(data, feature_size=6):
-    total_frames = data.shape[0] // feature_size
-    # 重新形状为 (num_groups, group_size, frame_size)
-    reshaped_data = data.reshape((total_frames, feature_size))
-    return reshaped_data
 
 
 aaaaaq = "./error910A7242__1713273736716__CN__Watch7,3__right__right__2024_04_16_21_22_16.ad"
@@ -43,13 +13,14 @@ aaaaaq = "./error910A7242__1713273736716__CN__Watch7,3__right__right__2024_04_16
 file_path = '../aatest/F954FC8A__1718433170022__CN__S8_45mm__right__right__2024_06_15_14_32_50.ad'  # './C13D0A02__1718283752630__CN__Watch7,2__right__right__2024_06_13_21_02_32.ad'
 
 # 读取二进制文件中的 float 数据
-float_data = read_floats_from_binary(file_path)
+motion_float_data = read_motion_floats_from_ad(file_path)
 
-motion_frame = reshape_data_to_motion_frame(float_data, feature_size=6)
+#数据变成 (none,6)
+motion_frame = reshape_motion_floats_to_motion_frames(motion_float_data, feature_size=6)
 print(motion_frame.shape)
 
 # 将数据重新形状为 (x, 25, 6)
-reshaped_data = reshape_data_to_frames(float_data, feature_size=6, window_size=25)
+reshaped_data = reshape_motion_floats_to_window_frames(motion_float_data, feature_size=6, window_size=25)
 print(reshaped_data.shape)
 
 

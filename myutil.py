@@ -6,6 +6,23 @@ import pandas as pd
 import csv
 
 
+def load_data_from_csv(file_path):
+    lines = open(file_path).readlines()
+    # print(lines)
+    lines = lines[1:]
+    dd = []
+    for l in lines:
+        sn = l.split(',')
+        # print(sn)
+        float_data = [float(x.strip('"\n')) for x in sn][1:]
+        if len(float_data) == 6:
+            dd.append(np.array(float_data))
+
+    # print(len(dd))
+    if len(dd) == 25:
+        return np.array(dd)
+
+
 def load_data_from_directory(directory):
     data = []
     # 遍历目录中的每个CSV文件
