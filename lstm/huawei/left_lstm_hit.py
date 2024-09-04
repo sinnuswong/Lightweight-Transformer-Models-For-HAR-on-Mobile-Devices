@@ -6,7 +6,12 @@ from tensorflow.keras.utils import to_categorical
 import coremltools as ct
 from keras.models import load_model
 import numpy as np
-import myutil
+import myutil_huawei
+import os
+
+current_file_path = os.path.abspath(__file__)
+# 获取当前文件所在的目录
+current_directory = os.path.dirname(current_file_path)
 
 l2 = tf.keras.regularizers.L2
 L2 = 0.000001
@@ -47,16 +52,19 @@ class LSTMModel(tf.keras.Model):
 
 
 # config
-window_size = 25
-feature_size = 6
+window_size = 130
+feature_size = 9
 num_classes = 2
+
 hidden_size = 128
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 128
 num_epochs = 10
 hit_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/左撇子所有 0426/左撇子hit'
-save_model_base_path = '/Users/sinnus/WorkSpace/Lightweight-Transformer-Models-For-HAR-on-Mobile-Devices/lstm/ios/left_model'
+save_model_base_path = current_directory + os.sep + 'left_model'
+model_name = 'left_lstm_hit'
+save_model_path_no_extension = save_model_base_path + os.sep + model_name
 
 # 创建模型
 inputs = Input(shape=input_shape)
@@ -75,7 +83,7 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 # 模型总结
 model.summary()
 
-data, labels = myutil.build_badminton_hit_data(hit_data_path=hit_data_path)
+data, labels = myutil_huawei.build_badminton_hit_data(hit_data_path=hit_data_path)
 print(data.shape)
 
 labels = to_categorical(labels, num_classes=num_classes)
@@ -155,9 +163,9 @@ def save_tflite(model, window_size, feature_size, hidden_size):
         tf.TensorSpec([1, hidden_size], model.inputs[2].dtype))
 
     # 保存模型
-    model.save(save_model_base_path + '/left_lstm_hit.keras')
+    model.save(save_model_path_no_extension + '.keras')
 
-    MODEL_DIR = save_model_base_path + "/left_lstm_hit"
+    MODEL_DIR = save_model_path_no_extension
     model.save(MODEL_DIR, save_format="tf", signatures=concrete_func)
 
     # 转换为TFLite模型
@@ -165,10 +173,10 @@ def save_tflite(model, window_size, feature_size, hidden_size):
     tflite_model = converter.convert()
 
     # 保存TFLite模型
-    with open(save_model_base_path + '/left_lstm_hit.tflite', 'wb') as f:
+    with open(save_model_path_no_extension + '.tflite', 'wb') as f:
         f.write(tflite_model)
     coreml_model = ct.convert([concrete_func])
-    coreml_model.save(save_model_base_path + '/left_lstm_hit.mlmodel')
+    coreml_model.save(save_model_path_no_extension + '.mlmodel')
 
 
 # 示例调用
