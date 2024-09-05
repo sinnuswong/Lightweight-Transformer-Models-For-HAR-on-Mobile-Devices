@@ -34,8 +34,19 @@ def merge_tflite_files_to_binary(output_file, input_files, config_file):
 
     # 将每个文件的开始和结束位置写入到配置文件中
     with open(config_file, 'w') as config:
+        config_ints = []
         for input_file, start, l in file_info:
-            config.write(f"{input_file}: start={start}, len={l}\n")
+            config_ints.append(start)
+            config_ints.append(l)
+
+        ss = ''
+        for i in config_ints:
+            if ss == '':
+                ss = ss + str(i)
+            else:
+                ss = ss + ', ' + str(i)
+
+        config.write(ss)
 
 
 input_files = ['test/left_lstm_hit.tflite', 'test/left_lstm_kill.tflite', ]  # 要合并的文件
