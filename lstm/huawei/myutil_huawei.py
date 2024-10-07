@@ -6,7 +6,7 @@ import pandas as pd
 import csv
 
 window = 130
-features = 9
+features = 6
 
 
 def load_data_from_csv(file_path):
@@ -20,6 +20,8 @@ def load_data_from_csv(file_path):
         float_data = [float(x.strip('"\n')) for x in sn][1:]
         if len(float_data) == features:
             dd.append(np.array(float_data))
+        else:
+            dd.append(np.array(float_data[:features]))
 
     # print(len(dd))
     if len(dd) == window:
@@ -49,6 +51,8 @@ def load_data_from_directory(directory):
                 float_data = [float(x.strip('"\n')) for x in sn][1:]
                 if len(float_data) == features:
                     dd.append(np.array(float_data))
+                else:
+                    dd.append(np.array(float_data[:features]))
 
             # print(len(dd))
             if len(dd) == window:

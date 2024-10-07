@@ -16,10 +16,10 @@ Adam = tf.keras.optimizers.Adam
 
 # configs
 window_size = 130
-feature_size = 9
+feature_size = 6
 num_classes = 3
 
-hidden_size = 64
+hidden_size = 128
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 32  # (128,50: 14,16), (32,50: 17,14),
@@ -34,9 +34,9 @@ epochs = 50  # (128,20: 20, 8) (32,20: 15, 16)
 # (128, 20: 10:12) , (128,128, 20: 10:12) ,
 # (128, 32,20: 2,28) (128, 32,50: 7,17)
 
-kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/右撇子kill_high_long_hit'
+kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c130/0921right/kill_high_long_hit'
 save_model_base_path = current_directory + os.sep + 'right_model'
-model_name = 'left_lstm_kill'
+model_name = 'right_lstm_kill'
 save_model_path_no_extension = save_model_base_path + os.sep + model_name
 
 L2 = 0.000001

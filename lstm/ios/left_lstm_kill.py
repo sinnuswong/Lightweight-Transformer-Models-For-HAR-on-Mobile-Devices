@@ -19,7 +19,7 @@ input_shape = (window_size, feature_size)
 batch_size = 32
 epochs = 20
 
-kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/左撇子所有 0426/左撇子kill_high_long_shot1'
+kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/左撇子所有 0426/左撇子kill_high_long_shot'
 save_model_base_path = '/Users/sinnus/WorkSpace/Lightweight-Transformer-Models-For-HAR-on-Mobile-Devices/lstm/ios/left_model'
 
 L2 = 0.000001

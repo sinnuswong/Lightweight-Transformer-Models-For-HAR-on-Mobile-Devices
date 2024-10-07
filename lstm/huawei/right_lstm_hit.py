@@ -53,7 +53,7 @@ class LSTMModel(tf.keras.Model):
 
 # config
 window_size = 130
-feature_size = 9
+feature_size = 6
 num_classes = 2
 
 hidden_size = 128
@@ -61,7 +61,7 @@ output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 128
 num_epochs = 10
-hit_data_path = '/Users/sinnus/WorkSpace/Lightweight-Transformer-Models-For-HAR-on-Mobile-Devices/lstm/train_hit_c25'
+hit_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c130/0921right/hit'
 save_model_base_path = current_directory + os.sep + 'right_model'
 model_name = 'right_lstm_hit'
 save_model_path_no_extension = save_model_base_path + os.sep + model_name

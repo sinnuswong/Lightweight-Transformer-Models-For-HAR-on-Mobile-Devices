@@ -16,27 +16,18 @@ Adam = tf.keras.optimizers.Adam
 
 # configs
 window_size = 130
-feature_size = 9
+feature_size = 6
 num_classes = 4
 
-hidden_size = 64
+hidden_size = 128
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 32  # (128,50: 14,16), (32,50: 17,14),
 epochs = 50  # (128,20: 20, 8) (32,20: 15, 16)
-##### 这里64，128， 50 最好。
-##### 这里64，32， 50 最好。
-# (64,32,50: 14,15) (64,32,20: 9,21)
-# (64,128,20: 0,23)
 
-# (128,128, 50: 14,17)
-
-# (128, 20: 10:12) , (128,128, 20: 10:12) ,
-# (128, 32,20: 2,28) (128, 32,50: 7,17)
-
-kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/右撇子kill_high_long_hit'
+fbou_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c130/0921right/fbou'
 save_model_base_path = current_directory + os.sep + 'right_model'
-model_name = 'left_lstm_fbou'
+model_name = 'right_lstm_fbou'
 save_model_path_no_extension = save_model_base_path + os.sep + model_name
 
 L2 = 0.000001
@@ -66,7 +57,7 @@ callbacks = [
     ModelCheckpoint(save_model_path_no_extension + '.h5', save_weights_only=False, save_best_only=True,
                     verbose=1)]
 
-data, labels = myutil_huawei.build_badminton_kill_data(kill_data_path=kill_data_path)
+data, labels = myutil_huawei.build_badminton_fbou_data(fbou_data_path=fbou_data_path)
 print(data.shape)
 
 labels = tf.keras.utils.to_categorical(labels, num_classes=num_classes)

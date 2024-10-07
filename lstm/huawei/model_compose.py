@@ -49,5 +49,10 @@ def merge_tflite_files_to_binary(output_file, input_files, config_file):
         config.write(ss)
 
 
-input_files = ['test/left_lstm_hit.tflite', 'test/left_lstm_kill.tflite', ]  # 要合并的文件
-merge_tflite_files_to_binary('left.model', input_files, 'left_model_file_config.txt')
+right_input_files = ['right_model/right_lstm_hit.tflite', 'right_model/right_lstm_fbou.tflite',
+                     'right_model/right_lstm_kill.tflite']  # 要合并的文件
+merge_tflite_files_to_binary('right_model/right.model', right_input_files, 'right_model/right_model_file_config.txt')
+
+# left_input_files = ['left_model/left_lstm_hit.tflite', 'left_model/left_lstm_fbou.tflite',
+#                      'left_model/left_lstm_kill.tflite']  # 要合并的文件
+# merge_tflite_files_to_binary('left.model', left_input_files, 'left_model_file_config.txt')
