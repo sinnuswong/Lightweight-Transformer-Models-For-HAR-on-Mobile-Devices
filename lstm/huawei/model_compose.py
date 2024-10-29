@@ -53,6 +53,6 @@ right_input_files = ['right_model/right_lstm_hit.tflite', 'right_model/right_lst
                      'right_model/right_lstm_kill.tflite']  # 要合并的文件
 merge_tflite_files_to_binary('right_model/right.model', right_input_files, 'right_model/right_model_file_config.txt')
 
-# left_input_files = ['left_model/left_lstm_hit.tflite', 'left_model/left_lstm_fbou.tflite',
-#                      'left_model/left_lstm_kill.tflite']  # 要合并的文件
-# merge_tflite_files_to_binary('left.model', left_input_files, 'left_model_file_config.txt')
+left_input_files = ['left_model/left_lstm_hit.tflite', 'left_model/left_lstm_fbou.tflite',
+                     'left_model/left_lstm_kill.tflite']  # 要合并的文件
+merge_tflite_files_to_binary('left_model/left.model', left_input_files, 'left_model/left_model_file_config.txt')
