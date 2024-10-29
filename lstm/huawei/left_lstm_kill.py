@@ -16,16 +16,25 @@ Adam = tf.keras.optimizers.Adam
 
 # configs
 window_size = 130
-feature_size = 9
+feature_size = 6
 num_classes = 3
 
-hidden_size = 64
+hidden_size = 256
 output_size = num_classes
 input_shape = (window_size, feature_size)
-batch_size = 32
-epochs = 20
+batch_size = 64  # (128,50: 14,16), (32,50: 17,14),
+epochs = 50  # (128,20: 20, 8) (32,20: 15, 16)
+##### 这里64，128， 50 最好。
+##### 这里64，32， 50 最好。
+# (64,32,50: 14,15) (64,32,20: 9,21)
+# (64,128,20: 0,23)
 
-kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/左撇子所有 0426/左撇子kill_high_long_shot1'
+# (128,128, 50: 14,17)
+
+# (128, 20: 10:12) , (128,128, 20: 10:12) ,
+# (128, 32,20: 2,28) (128, 32,50: 7,17)
+
+kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c130/1020left/kill_high_long_hit'
 save_model_base_path = current_directory + os.sep + 'left_model'
 model_name = 'left_lstm_kill'
 save_model_path_no_extension = save_model_base_path + os.sep + model_name
@@ -72,11 +81,11 @@ history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=epo
 #           batch_size=batch_size, epochs=epochs,
 #           validation_split=0.2, callbacks=callbacks)
 
-model.save(save_model_path_no_extension + '_final.h5')
+model.save(save_model_path_no_extension + '.h5')
 
 
 def save_mode():
-    best_model = load_model(save_model_base_path + '/left_lstm_kill.h5')
+    best_model = load_model(save_model_path_no_extension + '.h5')
     run_model = tf.function(lambda x: best_model(x))
     # This is important, let's fix the input size.
 
@@ -84,17 +93,17 @@ def save_mode():
         tf.TensorSpec([1, window_size, feature_size], model.inputs[0].dtype))
 
     # model directory.
-    MODEL_DIR = save_model_base_path + '/left_lstm_kill'
+    MODEL_DIR = save_model_path_no_extension
     model.save(MODEL_DIR, save_format="tf", signatures=concrete_func)
 
     converter = tf.lite.TFLiteConverter.from_saved_model(MODEL_DIR)
     tflite_model = converter.convert()
     # Save the model.
-    with open(save_model_base_path + '/left_lstm_kill.tflite', 'wb') as f:
+    with open(save_model_path_no_extension + '.tflite', 'wb') as f:
         f.write(tflite_model)
 
     coreml_model = ct.convert([concrete_func])
-    coreml_model.save(save_model_base_path + '/left_lstm_kill.mlmodel')
+    coreml_model.save(save_model_path_no_extension + '.mlmodel')
 
 
 # save_mode()
