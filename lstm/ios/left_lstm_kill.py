@@ -2,9 +2,15 @@ import tensorflow as tf
 import numpy as np
 from keras.layers import ConvLSTM2D
 from tensorflow.keras.models import load_model
-import myutil
 from sklearn.model_selection import train_test_split
 import coremltools as ct
+import os
+
+import myutil
+
+current_file_path = os.path.abspath(__file__)
+# 获取当前文件所在的目录
+current_directory = os.path.dirname(current_file_path)
 
 l2 = tf.keras.regularizers.L2
 Adam = tf.keras.optimizers.Adam
@@ -17,10 +23,12 @@ hidden_size = 64
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 32
-epochs = 20
+epochs = 30
 
-kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/左撇子所有 0426/左撇子kill_high_long_shot'
-save_model_base_path = '/Users/sinnus/WorkSpace/Lightweight-Transformer-Models-For-HAR-on-Mobile-Devices/lstm/ios/left_model'
+kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/左撇子所有/kill_high_long_hit'
+save_model_base_path = current_directory + os.sep + 'left_model'
+model_name = 'left_lstm_kill'
+save_model_path_no_extension = save_model_base_path + os.sep + model_name
 
 L2 = 0.000001
 
@@ -46,7 +54,7 @@ model.compile(loss='categorical_crossentropy', optimizer=Adam(learning_rate=LR),
 from keras.callbacks import ModelCheckpoint
 
 callbacks = [
-    ModelCheckpoint(save_model_base_path + '/left_lstm_kill.h5', save_weights_only=False, save_best_only=True,
+    ModelCheckpoint(save_model_path_no_extension + '.h5', save_weights_only=False, save_best_only=True,
                     verbose=1)]
 
 data, labels = myutil.build_badminton_kill_data(kill_data_path=kill_data_path)
@@ -64,11 +72,11 @@ history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=epo
 #           batch_size=batch_size, epochs=epochs,
 #           validation_split=0.2, callbacks=callbacks)
 
-model.save(save_model_base_path + '/lstm3_latest_kill.h5')
+model.save(save_model_path_no_extension + '.h5')
 
 
 def save_mode():
-    best_model = load_model(save_model_base_path + '/left_lstm_kill.h5')
+    best_model = load_model(save_model_path_no_extension + '.h5')
     run_model = tf.function(lambda x: best_model(x))
     # This is important, let's fix the input size.
 
@@ -76,17 +84,17 @@ def save_mode():
         tf.TensorSpec([1, window_size, feature_size], model.inputs[0].dtype))
 
     # model directory.
-    MODEL_DIR = save_model_base_path + '/left_lstm_kill'
+    MODEL_DIR = save_model_path_no_extension
     model.save(MODEL_DIR, save_format="tf", signatures=concrete_func)
 
     converter = tf.lite.TFLiteConverter.from_saved_model(MODEL_DIR)
     tflite_model = converter.convert()
     # Save the model.
-    with open(save_model_base_path + '/left_lstm_kill.tflite', 'wb') as f:
+    with open(save_model_path_no_extension + '.tflite', 'wb') as f:
         f.write(tflite_model)
 
     coreml_model = ct.convert([concrete_func])
-    coreml_model.save(save_model_base_path + '/left_lstm_kill.mlmodel')
+    coreml_model.save(save_model_path_no_extension + '.mlmodel')
 
 
 # save_mode()
@@ -96,13 +104,13 @@ concrete_func = run_model.get_concrete_function(
     tf.TensorSpec([1, window_size, feature_size], model.inputs[0].dtype))
 
 # model directory.
-MODEL_DIR = save_model_base_path + '/left_lstm_kill'
+MODEL_DIR = save_model_path_no_extension
 model.save(MODEL_DIR, save_format="tf", signatures=concrete_func)
 
 converter = tf.lite.TFLiteConverter.from_saved_model(MODEL_DIR)
 tflite_model = converter.convert()
 # Save the model.
-with open(save_model_base_path + '/left_lstm_kill.tflite', 'wb') as f:
+with open(save_model_path_no_extension + '.tflite', 'wb') as f:
     f.write(tflite_model)
-coreml_model = ct.convert(save_model_base_path + '/left_lstm_kill.h5')
-coreml_model.save(save_model_base_path + '/left_lstm_kill.mlmodel')
+coreml_model = ct.convert(save_model_path_no_extension + '.h5')
+coreml_model.save(save_model_path_no_extension + '.mlmodel')
