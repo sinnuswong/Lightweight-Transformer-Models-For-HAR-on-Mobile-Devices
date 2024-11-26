@@ -49,10 +49,25 @@ def merge_tflite_files_to_binary(output_file, input_files, config_file):
         config.write(ss)
 
 
+def build_random_tflite():
+    # 生成 256KB 的随机二进制数据
+    file_size_kb = 256
+    file_size_bytes = file_size_kb * 1024  # 转换为字节数
+
+    # 使用 os.urandom() 生成随机的二进制数据
+    random_data = os.urandom(file_size_bytes)
+
+    # 将随机数据写入文件
+    with open('random_data.tflite', 'wb') as file:
+        file.write(random_data)
+
+    print(f"文件已生成，大小为 {file_size_kb}KB。")
+
+
 right_input_files = ['right_model/right_lstm_hit.tflite', 'right_model/right_lstm_fbou.tflite',
                      'right_model/right_lstm_kill.tflite']  # 要合并的文件
 merge_tflite_files_to_binary('right_model/right.model', right_input_files, 'right_model/right_model_file_config.txt')
 
 left_input_files = ['left_model/left_lstm_hit.tflite', 'left_model/left_lstm_fbou.tflite',
-                     'left_model/left_lstm_kill.tflite']  # 要合并的文件
+                    'left_model/left_lstm_kill.tflite']  # 要合并的文件
 merge_tflite_files_to_binary('left_model/left.model', left_input_files, 'left_model/left_model_file_config.txt')
