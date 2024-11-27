@@ -51,11 +51,9 @@ callbacks = [
     ModelCheckpoint("__best_my_model_test.h5", save_weights_only=False, save_best_only=True,
                     verbose=1)]
 # 训练模型
-model.fit(data, labels, epochs=4, batch_size=64, validation_split=0.2, callbacks=callbacks)
-model.save('__my_model_test.h5', save_format='tf')
+model.fit(data, labels, epochs=4, batch_size=64, validation_split=0.2)
+# model.save('__my_model_test.h5', save_format='tf')
 
-# 加载模型
-# loaded_model = load_model('my_model.h5')
 
 # 显示模型结构和摘要
 model.summary()
@@ -63,10 +61,10 @@ model.summary()
 run_model = tf.function(lambda x: model(x))
 
 concrete_func = run_model.get_concrete_function(
-    tf.TensorSpec([1, window_size, feature_size], model.inputs[0].dtype))
+    tf.TensorSpec([1, window_size, feature_size], dtype=tf.float32))
 
 # model directory.
-MODEL_DIR = '__my_model_test'
+MODEL_DIR = 'my_model_test'
 model.save(MODEL_DIR, save_format="tf", signatures=concrete_func)
 
 converter = tf.lite.TFLiteConverter.from_saved_model(MODEL_DIR)

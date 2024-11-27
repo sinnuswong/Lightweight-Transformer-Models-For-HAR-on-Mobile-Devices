@@ -24,15 +24,6 @@ output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 64  # (128,50: 14,16), (32,50: 17,14),
 epochs = 50  # (128,20: 20, 8) (32,20: 15, 16)
-##### 这里64，128， 50 最好。
-##### 这里64，32， 50 最好。
-# (64,32,50: 14,15) (64,32,20: 9,21)
-# (64,128,20: 0,23)
-
-# (128,128, 50: 14,17)
-
-# (128, 20: 10:12) , (128,128, 20: 10:12) ,
-# (128, 32,20: 2,28) (128, 32,50: 7,17)
 
 kill_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c130/1020left/kill_high_long_hit'
 save_model_base_path = current_directory + os.sep + 'left_model'
@@ -77,33 +68,7 @@ X_train, X_val, y_train, y_val = train_test_split(data, labels, test_size=0.2, r
 history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=epochs, batch_size=batch_size,
                     callbacks=callbacks)
 
-# model.fit(data, labels,
-#           batch_size=batch_size, epochs=epochs,
-#           validation_split=0.2, callbacks=callbacks)
-
 model.save(save_model_path_no_extension + '.h5')
-
-
-def save_mode():
-    best_model = load_model(save_model_path_no_extension + '.h5')
-    run_model = tf.function(lambda x: best_model(x))
-    # This is important, let's fix the input size.
-
-    concrete_func = run_model.get_concrete_function(
-        tf.TensorSpec([1, window_size, feature_size], model.inputs[0].dtype))
-
-    # model directory.
-    MODEL_DIR = save_model_path_no_extension
-    model.save(MODEL_DIR, save_format="tf", signatures=concrete_func)
-
-    converter = tf.lite.TFLiteConverter.from_saved_model(MODEL_DIR)
-    tflite_model = converter.convert()
-    # Save the model.
-    with open(save_model_path_no_extension + '.tflite', 'wb') as f:
-        f.write(tflite_model)
-
-    coreml_model = ct.convert([concrete_func])
-    coreml_model.save(save_model_path_no_extension + '.mlmodel')
 
 
 # save_mode()
@@ -121,5 +86,4 @@ tflite_model = converter.convert()
 # Save the model.
 with open(save_model_path_no_extension + '.tflite', 'wb') as f:
     f.write(tflite_model)
-coreml_model = ct.convert(save_model_path_no_extension + '.h5')
-coreml_model.save(save_model_path_no_extension + '.mlmodel')
+
