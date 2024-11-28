@@ -43,7 +43,7 @@ L2 = 0.000001
 
 model = tf.keras.Sequential(name='sequential_1')
 
-model.add(tf.keras.layers.LSTM(hidden_size, return_sequences=False, input_shape=(window_size, feature_size),
+model.add(tf.keras.layers.LSTM(128, return_sequences=False, input_shape=(window_size, feature_size),
                                kernel_initializer='orthogonal', kernel_regularizer=l2(L2), recurrent_regularizer=l2(L2),
                                bias_regularizer=l2(L2), name="LSTM_1"))
 
