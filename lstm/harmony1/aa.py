@@ -1,0 +1,64 @@
+import mindspore
+from mindspore import nn, context
+from mindspore import Tensor
+from mindspore import save_checkpoint, load_checkpoint, load_param_into_net
+from mindspore.train import Model
+import numpy as np
+
+class LSTMModel(nn.Cell):
+    def __init__(self, input_size, hidden_size, num_layers, output_size):
+        super(LSTMModel, self).__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+        self.fc = nn.Dense(hidden_size, output_size)
+
+    def construct(self, x):
+        lstm_out, _ = self.lstm(x)
+        last_time_step_output = lstm_out[:, -1, :]
+        output = self.fc(last_time_step_output)
+        return output
+
+# 设置运行模式
+context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
+
+# 参数设置
+batch_size = 32
+seq_length = 10
+input_size = 5
+hidden_size = 64
+num_layers = 2
+output_size = 1
+
+# 创建随机数据
+x_data = np.random.randn(batch_size, seq_length, input_size).astype(np.float32)
+y_data = np.random.randn(batch_size, output_size).astype(np.float32)
+
+x = Tensor(x_data)
+y = Tensor(y_data)
+
+# 初始化模型、损失函数和优化器
+model = LSTMModel(input_size, hidden_size, num_layers, output_size)
+loss_fn = nn.MSELoss()
+optimizer = nn.Adam(params=model.get_parameters(), learning_rate=0.001)
+
+# 创建 Model 实例
+model_wrapper = Model(model, loss_fn=loss_fn, optimizer=optimizer)
+
+# 训练模型
+def train(model_wrapper, x, y, epochs=10):
+    for epoch in range(epochs):
+        loss = model_wrapper.train(1, x, y)
+        print(f"Epoch [{epoch + 1}/{epochs}], Loss: {loss}")
+
+train(model_wrapper, x, y, epochs=10)
+
+# 保存模型
+checkpoint_file = "lstm_model.ckpt"
+save_checkpoint(model, checkpoint_file)
+print(f"模型已保存至 {checkpoint_file}")
+
+# 加载模型
+loaded_model = LSTMModel(input_size, hidden_size, num_layers, output_size)
+param_dict = load_checkpoint(checkpoint_file)
+load_param_into_net(loaded_model, param_dict)
+print("模型已加载")
+

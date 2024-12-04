@@ -55,7 +55,7 @@ class LSTMModel(tf.keras.Model):
 window_size = 25
 feature_size = 6
 num_classes = 2
-hidden_size = 128
+hidden_size = 32
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 128

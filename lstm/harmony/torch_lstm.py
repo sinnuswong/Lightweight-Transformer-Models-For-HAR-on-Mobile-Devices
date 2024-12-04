@@ -11,8 +11,8 @@ num_classes = 3
 hidden_size = 256
 L2 = 0.000001
 learning_rate = 0.001
-batch_size = 128
-epochs = 200
+batch_size = 64
+epochs = 50
 
 
 # 定义模型
