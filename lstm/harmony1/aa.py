@@ -1,64 +1,95 @@
-import mindspore
-from mindspore import nn, context
-from mindspore import Tensor
-from mindspore import save_checkpoint, load_checkpoint, load_param_into_net
-from mindspore.train import Model
 import numpy as np
+import mindspore as ms
+from mindspore import nn, context, Tensor, ops
+from mindspore.dataset import GeneratorDataset
 
-class LSTMModel(nn.Cell):
-    def __init__(self, input_size, hidden_size, num_layers, output_size):
-        super(LSTMModel, self).__init__()
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Dense(hidden_size, output_size)
+import myutil_huawei
 
-    def construct(self, x):
-        lstm_out, _ = self.lstm(x)
-        last_time_step_output = lstm_out[:, -1, :]
-        output = self.fc(last_time_step_output)
-        return output
+import os
 
-# 设置运行模式
+current_file_path = os.path.abspath(__file__)
+current_directory = os.path.dirname(current_file_path)
+hit_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c130/0921right/hit'
+save_model_base_path = current_directory + os.sep + 'right_model'
+model_name = 'right_dense_hit'
+save_model_path_no_extension = save_model_base_path + os.sep + model_name
+
+# 设置执行上下文
 context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
 
-# 参数设置
-batch_size = 32
-seq_length = 10
-input_size = 5
-hidden_size = 64
-num_layers = 2
-output_size = 1
 
-# 创建随机数据
-x_data = np.random.randn(batch_size, seq_length, input_size).astype(np.float32)
-y_data = np.random.randn(batch_size, output_size).astype(np.float32)
+# 数据生成器
+def generate_data(num_samples=1000, input_shape=(130, 6)):
+    for _ in range(num_samples):
+        x = np.random.rand(*input_shape).astype(np.float32)
+        y = np.random.randint(0, 2)  # y 是标量
+        yield x, y
 
-x = Tensor(x_data)
-y = Tensor(y_data)
 
-# 初始化模型、损失函数和优化器
-model = LSTMModel(input_size, hidden_size, num_layers, output_size)
-loss_fn = nn.MSELoss()
-optimizer = nn.Adam(params=model.get_parameters(), learning_rate=0.001)
+class CustomDataset:
+    def __init__(self, num_samples=1000, input_shape=(130, 6)):
+        self.data = list(generate_data(num_samples, input_shape))
 
-# 创建 Model 实例
-model_wrapper = Model(model, loss_fn=loss_fn, optimizer=optimizer)
+    def __getitem__(self, index):
+        return self.data[index]
 
-# 训练模型
-def train(model_wrapper, x, y, epochs=10):
-    for epoch in range(epochs):
-        loss = model_wrapper.train(1, x, y)
-        print(f"Epoch [{epoch + 1}/{epochs}], Loss: {loss}")
+    def __len__(self):
+        return len(self.data)
 
-train(model_wrapper, x, y, epochs=10)
 
-# 保存模型
-checkpoint_file = "lstm_model.ckpt"
-save_checkpoint(model, checkpoint_file)
-print(f"模型已保存至 {checkpoint_file}")
+# 模型定义
+class LSTMClassifier(nn.Cell):
+    def __init__(self, input_size, hidden_size, num_classes):
+        super(LSTMClassifier, self).__init__()
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, batch_first=True)
+        self.fc1 = nn.Dense(hidden_size, 32)
+        self.fc2 = nn.Dense(32, num_classes)
 
-# 加载模型
-loaded_model = LSTMModel(input_size, hidden_size, num_layers, output_size)
-param_dict = load_checkpoint(checkpoint_file)
-load_param_into_net(loaded_model, param_dict)
-print("模型已加载")
+    def construct(self, x):
+        _, (hn, _) = self.lstm(x)
+        hn = hn[-1]  # 获取最后一层的输出
+        x = ops.relu(self.fc1(hn))
+        x = self.fc2(x)
+        return x
 
+
+# 超参数
+input_size = 6
+sequence_length = 130
+hidden_size = 32
+num_classes = 2
+batch_size = 16
+num_epochs = 5
+learning_rate = 0.001
+
+# 数据加载
+data = CustomDataset(num_samples=1000, input_shape=(sequence_length, input_size))
+train_dataset = GeneratorDataset(data, column_names=["data", "label"], shuffle=True)
+train_dataset = train_dataset.batch(batch_size, drop_remainder=True)  # batch_size 对齐
+
+# 初始化模型
+model = LSTMClassifier(input_size=input_size, hidden_size=hidden_size, num_classes=num_classes)
+loss_fn = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+optimizer = nn.Adam(model.trainable_params(), learning_rate=learning_rate)
+
+# 设置训练
+net_with_loss = nn.WithLossCell(model, loss_fn)
+train_network = nn.TrainOneStepCell(net_with_loss, optimizer)
+train_network.set_train()
+
+# 训练
+for epoch in range(num_epochs):
+    for batch, (x, y) in enumerate(train_dataset.create_tuple_iterator()):
+        x = Tensor(x, ms.float32)
+        y = Tensor(y, ms.int32).squeeze()  # 确保标签是 1D
+        loss = train_network(x, y)
+        if batch % 10 == 0:
+            print(f"Epoch [{epoch + 1}/{num_epochs}], Step [{batch}], Loss: {loss.asnumpy():.4f}")
+
+# 测试
+model.set_train(False)
+test_sample = np.random.rand(1, sequence_length, input_size).astype(np.float32)
+test_tensor = Tensor(test_sample, ms.float32)
+output = model(test_tensor)
+predicted_class = ops.argmax(output, axis=1)
+print("Test sample prediction:", predicted_class.asnumpy())

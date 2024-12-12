@@ -19,7 +19,7 @@ window_size = 130
 feature_size = 6
 num_classes = 3
 
-hidden_size = 256
+hidden_size = 128
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 64  # (128,50: 14,16), (32,50: 17,14),

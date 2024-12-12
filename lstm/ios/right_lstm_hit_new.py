@@ -19,11 +19,11 @@ Adam = tf.keras.optimizers.Adam
 window_size = 25
 feature_size = 6
 num_classes = 2
-hidden_size = 32
+hidden_size = 16
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 64
-epochs = 16
+epochs = 25
 
 hit_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/右撇子所有/hit'
 save_model_base_path = current_directory + os.sep + 'right_model'

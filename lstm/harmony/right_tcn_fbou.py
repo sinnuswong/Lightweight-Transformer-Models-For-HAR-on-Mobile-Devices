@@ -30,13 +30,13 @@ dense_size = 128
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 32  # (128,50: 14,16), (32,50: 17,14),
-epochs = 25  # (128,20: 20, 8) (32,20: 15, 16)
+epochs = 9  # (128,20: 20, 8) (32,20: 15, 16)
 
 L2 = 0.000001
 
 model = tf.keras.Sequential(name='sequential_1')
 model.add(TCN(nb_filters=hidden_size,
-              kernel_size=5,  # 卷积核大小
+              kernel_size=3,  # 卷积核大小
               dilations=[1, 2, 4, 8],  # 膨胀率
               return_sequences=False,
               kernel_initializer='orthogonal',
