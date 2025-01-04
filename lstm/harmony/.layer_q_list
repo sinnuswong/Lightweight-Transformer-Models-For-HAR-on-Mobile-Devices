@@ -1,0 +1,1 @@
+{'input_1': [7, 0], 'intermediate_lstm': [7, 4, 4], 'lstm': [7, 0], 'dense': [6, 0], 'dense_1': [5, 0], 'dense_2': [4, 0], 'softmax': [7, 0]}
