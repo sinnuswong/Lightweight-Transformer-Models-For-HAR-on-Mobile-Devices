@@ -21,7 +21,7 @@ l2 = tf.keras.regularizers.L2
 Adam = tf.keras.optimizers.Adam
 
 # configs
-window_size = 130
+window_size = 65
 feature_size = 6
 num_classes = 2
 
@@ -31,8 +31,8 @@ output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 128  # (128,50: 14,16), (32,50: 17,14),
 epochs = 10  # (128,20: 20, 8) (32,20: 15, 16)
-max_acc = 40.033665
-max_gyro = 8.0
+max_acc = 8.0
+max_gyro = 40.033665
 L2 = 0.000001
 # 32, 10, 128
 

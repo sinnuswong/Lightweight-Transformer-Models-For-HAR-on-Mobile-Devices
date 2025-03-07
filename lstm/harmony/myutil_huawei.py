@@ -56,7 +56,8 @@ def load_data_from_directory(directory):
 
             # print(len(dd))
             if len(dd) == window:
-                data.append(np.array(dd))
+                abc = np.array(dd)
+                data.append(abc[::2, :]) #切片 130-> 65
 
     return np.stack(data)
 
