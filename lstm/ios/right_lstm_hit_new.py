@@ -59,6 +59,7 @@ callbacks = [
 
 data, labels = myutil.build_badminton_hit_data(hit_data_path=hit_data_path)
 print(data.shape)
+# x = -x, y = -y, z = z;
 
 labels = tf.keras.utils.to_categorical(labels, num_classes=num_classes)
 print(labels.shape)
