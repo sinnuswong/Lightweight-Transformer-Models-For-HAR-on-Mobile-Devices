@@ -23,7 +23,7 @@ hidden_size = 32
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 64
-epochs = 30
+epochs = 15
 
 hit_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/左撇子所有/hit'
 save_model_base_path = current_directory + os.sep + 'left_model'

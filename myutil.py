@@ -23,6 +23,9 @@ def load_data_from_csv(file_path):
         return np.array(dd)
 
 
+arguement_data = True  # 数据增强，
+
+
 def load_data_from_directory(directory):
     data = []
     # 遍历目录中的每个CSV文件
@@ -40,16 +43,23 @@ def load_data_from_directory(directory):
             # print(lines)
             lines = lines[1:]
             dd = []
+            arg_dd = [] #增强的dd
             for l in lines:
                 sn = l.split(',')
                 # print(sn)
                 float_data = [float(x.strip('"\n')) for x in sn][1:]
                 if len(float_data) == 6:
                     dd.append(np.array(float_data))
+                    if arguement_data:
+                        arg = [-float_data[0], -float_data[1], float_data[2], -float_data[3], -float_data[4],
+                                      float_data[5]]
+                        arg_dd.append(np.array(arg))
 
             # print(len(dd))
             if len(dd) == 25:
                 data.append(np.array(dd))
+            if len(arg_dd) == 25:
+                data.append(np.array(arg_dd))
 
     return np.stack(data)
 

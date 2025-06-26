@@ -23,7 +23,7 @@ hidden_size = 32
 output_size = num_classes
 input_shape = (window_size, feature_size)
 batch_size = 64
-epochs = 25
+epochs = 12 # 25数据多了，增强了，需要减少轮数,不然识别一次都0.8以上，容易误判
 
 hit_data_path = '/Users/sinnus/Desktop/ActivityData/badminton/c25/右撇子所有/hit'
 save_model_base_path = current_directory + os.sep + 'right_model'
