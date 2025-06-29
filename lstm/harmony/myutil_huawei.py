@@ -7,6 +7,7 @@ import csv
 
 window = 130
 features = 6
+arguement_data = True  # 数据增强，
 
 
 def load_data_from_csv(file_path):
@@ -28,7 +29,7 @@ def load_data_from_csv(file_path):
         return np.array(dd)
 
 
-def load_data_from_directory(directory):
+def load_data_from_directory1(directory):
     data = []
     # 遍历目录中的每个CSV文件
     for filename in os.listdir(directory):
@@ -58,6 +59,52 @@ def load_data_from_directory(directory):
             if len(dd) == window:
                 abc = np.array(dd)
                 data.append(abc[::2, :]) #切片 130-> 65
+
+    return np.stack(data)
+
+def load_data_from_directory(directory):
+    data = []
+    # 遍历目录中的每个CSV文件
+    for filename in os.listdir(directory):
+        if filename.endswith(".csv"):
+            filepath = os.path.join(directory, filename)
+            # # 读取CSV文件
+            # df = pd.read_csv(filepath, encoding='utf-8')
+            # # 丢弃第一列（时间列），保留后面的6列数据
+            # df = df.iloc[:, 1:]
+            # # 将数据添加到列表中
+            # data.append(df.values)
+            # print(filepath)
+            lines = open(filepath).readlines()
+            # print(lines)
+            lines = lines[1:]
+            dd = []
+            arg_dd = []  # 增强的dd
+
+            for l in lines:
+                sn = l.split(',')
+                # print(sn)
+                float_data = [float(x.strip('"\n')) for x in sn][1:]  #去掉时间
+                if len(float_data) == features:
+                    dd.append(np.array(float_data))
+                    if arguement_data:
+                        arg = [-float_data[0], -float_data[1], float_data[2], -float_data[3], -float_data[4],
+                               float_data[5]]
+                        arg_dd.append(np.array(arg))
+                else:
+                    dd.append(np.array(float_data[:features]))
+                    if arguement_data:
+                        arg = [-float_data[0], -float_data[1], float_data[2], -float_data[3], -float_data[4],
+                               float_data[5]]
+                        arg_dd.append(np.array(arg))
+
+            # print(len(dd))
+            if len(dd) == window:
+                abc = np.array(dd)
+                data.append(abc[::2, :])  # 切片 130-> 65
+            if len(arg_dd) == window:
+                arg_abc = np.array(arg_dd)
+                data.append(arg_abc[::2, :])  # 切片 130-> 65
 
     return np.stack(data)
 

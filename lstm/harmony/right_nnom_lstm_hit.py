@@ -90,7 +90,7 @@ def train(x_train, y_train, x_test, y_test, batch_size=64, epochs=100):
     x = Flatten()(x)
 
     # x = MaxPooling1D()
-    x = Dense(8)(x)
+    # x = Dense(8)(x)
     x = Dense(32)(x)
     x = Dense(num_classes)(x)
     predictions = Softmax()(x)
